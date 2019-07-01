@@ -1,0 +1,60 @@
+{   "total_count": 5,
+    "list":
+    [
+        {
+            "Id": "473",
+            "serverInstanceId":"9b3d59ef75994196bfd5f8fc8a68b12f",
+            "role":"1",
+            "isReadOnly":"1",
+            "physicalIp":"192.168.1.1",
+            "physicalPort": "3306",
+            "status":"运行中",
+            "createTime":"2018-11-06 11:35:58",
+            "destroyTime":"2018-11-06 11:35:58"
+        },
+        {
+            "Id": "474",
+            "serverInstanceId":"9b3d59ef75994196bfd5f8fc8a68b12f",
+            "role":"1",
+            "isReadOnly":"1",
+            "physicalIp":"192.168.1.1",
+            "physicalPort": "3306",
+            "status":"运行中",
+            "createTime":"2018-11-06 11:35:58",
+            "destroyTime":"2018-11-06 11:35:58"
+        },
+        {
+            "Id": "475",
+            "serverInstanceId":"9b3d59ef75994196bfd5f8fc8a68b12f",
+            "role":"1",
+            "isReadOnly":"1",
+            "physicalIp":"192.168.1.1",
+            "physicalPort": "3306",
+            "status":"运行中",
+            "createTime":"2018-11-06 11:35:58",
+            "destroyTime":"2018-11-06 11:35:58"
+        },
+        {
+            "Id": "476",
+            "serverInstanceId":"9b3d59ef75994196bfd5f8fc8a68b12f",
+            "role":"1",
+            "isReadOnly":"1",
+            "physicalIp":"192.168.1.1",
+            "physicalPort": "3306",
+            "status":"运行中",
+            "createTime":"2018-11-06 11:35:58",
+            "destroyTime":"2018-11-06 11:35:58"
+        },
+        {
+            "Id": "477",
+            "serverInstanceId":"9b3d59ef75994196bfd5f8fc8a68b12f",
+            "role":"1",
+            "isReadOnly":"1",
+            "physicalIp":"192.168.1.1",
+            "physicalPort": "3306",
+            "status":"运行中",
+            "createTime":"2018-11-06 11:35:58",
+            "destroyTime":"2018-11-06 11:35:58"
+        }
+    ]
+}
