@@ -20,7 +20,7 @@
                     <!--<el-table-column prop="goodsType" label="商品类别"  ></el-table-column>-->
                     <el-table-column prop="sellerName" label="商家名称"></el-table-column>
                     <el-table-column prop="introduce" label="商家介绍"></el-table-column>
-                    <el-table-column prop="sellerStatus" label="状态"></el-table-column>
+                    <el-table-column prop="sellerStatusName" label="状态"></el-table-column>
                     <el-table-column prop="image" label="商家图片">
                         <template slot-scope="scope">
                             <img :src="scope.row.image" style="width: 100px; height: 100px" class="image"/>
@@ -68,19 +68,20 @@
                         </el-form-item>
 
                         <el-form-item label="状态:">
-                            <el-select placeholder="请选择">
+                            <el-select :placeholder="showSellerStatus(editForm)" @change="onChangeStatus"
+                                       :remote-method="remoteMethod">
                                 <el-option
                                         v-for="item in sellerStatus"
                                         :key="item.value"
                                         :label="item.label"
-                                        :value="item.value">
+                                        :value="item">
                                 </el-option>
                             </el-select>
                         </el-form-item>
 
                     </div>
                     <el-form-item label="营业执照:">
-                        <img :src="editForm.image" style="width: 100px; height: 100px" class="image"/>
+                        <img :src="editForm.license" style="width: 100px; height: 100px" class="image"/>
 
                     </el-form-item>
                 </el-form>
@@ -157,6 +158,11 @@
                     params: {p: this.cur_page, size: 10}
                 }).then((res) => {
                     this.tableData = res.data.data.data;
+                    console.log(this.tableData.length);
+                    for (let i = 0; i < this.tableData.length; i++) {
+                        console.log(this.tableData[i]);
+                        this.tableData[i].sellerStatusName = this.tableData[i].sellerStatus == 0 ? "无效" : "有效";
+                    }
                     this.total = res.data.size;
                     console.log(res);
                 })
@@ -186,7 +192,7 @@
                     modifiedTime: item.modifiedTime
                 }
                 this.editVisible = true;
-                this.editForm = Object.assign({}, row)
+                this.editForm = Object.assign({}, row);
                 console.log(this.editForm)
             },
             handleDelete(index, row) {
@@ -230,7 +236,7 @@
                     sellerName: data.sellerName,
                     introduce: data.introduce,
                     image: data.image,
-                    sellerStatus: this.value
+                    sellerStatus: data.sellerStatus
                 }).then((res) => {
                     console.log("res" + res.data.code);
                     if (res.data.code == 0) {
@@ -241,6 +247,18 @@
                     this.editVisible = false;
                 }).finally(this.loading_status = false)
 
+            },
+            showSellerStatus(editForm) {
+                if (editForm.sellerStatus == 0) {
+                    return "无效";
+                } else if (editForm.sellerStatus == 1) {
+                    return "有效";
+                }
+            },
+            onChangeStatus(event) {
+                this.editForm.sellerStatus = event.value;
+                // debugger
+                // console.log("下拉选中"+event.value)
             },
             getZoneCoursesetLists(item) {
                 // console.log(item);
