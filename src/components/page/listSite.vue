@@ -1,41 +1,66 @@
 <template>
 
-                    <div class="table">
-                        <div class="container">
-                            <div class="handle-box">
-                                <!--<el-button type="warning" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button>-->
-                                <!--<el-select v-model="select_cate" placeholder="筛选job状态" class="handle-select mr10">-->
-                                    <!--<el-option key="1" label="unready" value="-1"></el-option>-->
-                                    <!--<el-option key="2" label="ready" value="0"></el-option>-->
-                                    <!--<el-option key="3" label="running" value="1"></el-option>-->
-                                    <!--<el-option key="4" label="finished" value="2"></el-option>-->
-                                    <!--<el-option key="5" label="failed" value="3"></el-option>-->
-                                    <!--<el-option key="6" label="error" value="4"></el-option>-->
-                                <!--</el-select>-->
-                                <el-input v-model="select_word" placeholder="地点名称" class="handle-input mr10"></el-input>
-                                <el-button type="warning" icon="search" :loading="loading_status" @click="search">搜索</el-button>
-                            </div>
-                            <el-table :data="tableData" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
-                                <el-table-column type="selection" width="55" align="center"></el-table-column>
-                                <el-table-column prop="siteId" label="ID" sortable ></el-table-column>
-                                <el-table-column prop="siteName" label="名称"  ></el-table-column>
-                                <el-table-column prop="status" label="状态"  ></el-table-column>
-                                <el-table-column prop="updateTime" label="更新时间"  ></el-table-column>
-                                <el-table-column prop="createTime" label="创建时间" ></el-table-column>
-                                <!--<el-table-column label="操作"  align="center">-->
-                                    <!--<template slot-scope="scope">-->
-                                        <!--<el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>-->
-                                        <!--<el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>-->
-                                    <!--</template>-->
-                                <!--</el-table-column>-->
-                            </el-table>
-                            <div class="pagination">
-                                <el-pagination background @current-change="handleCurrentChange" layout="prev, pager, next" :total="(this.total)">
-                                </el-pagination>
-                            </div>
-                        </div>
+    <div class="table">
+        <div class="container">
+            <div class="handle-box">
+                <!--<el-button type="warning" icon="delete" class="handle-del mr10" @click="delAll">批量删除</el-button>-->
+                <!--<el-select v-model="select_cate" placeholder="筛选job状态" class="handle-select mr10">-->
+                <!--<el-option key="1" label="unready" value="-1"></el-option>-->
+                <!--<el-option key="2" label="ready" value="0"></el-option>-->
+                <!--<el-option key="3" label="running" value="1"></el-option>-->
+                <!--<el-option key="4" label="finished" value="2"></el-option>-->
+                <!--<el-option key="5" label="failed" value="3"></el-option>-->
+                <!--<el-option key="6" label="error" value="4"></el-option>-->
+                <!--</el-select>-->
+                <el-input v-model="select_word" placeholder="地点名称" class="handle-input mr10"></el-input>
+                <el-button type="warning" icon="search" :loading="loading_status" @click="search">搜索</el-button>
+            </div>
+            <el-table :data="tableData" border class="table" ref="multipleTable"
+                      @selection-change="handleSelectionChange">
+                <el-table-column type="selection" width="55" align="center"></el-table-column>
+                <el-table-column prop="siteId" label="ID" sortable></el-table-column>
+                <el-table-column prop="siteName" label="名称"></el-table-column>
+                <el-table-column prop="status" label="状态"></el-table-column>
+                <el-table-column prop="updateTime" label="更新时间"></el-table-column>
+                <el-table-column prop="createTime" label="创建时间"></el-table-column>
+                <!--<el-table-column prop="caozuo" label="操作" ></el-table-column>-->
+                <el-table-column label="操作" align="center">
+                    <template slot-scope="scope">
+                        <el-button type="primary" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑
+                        </el-button>
+                        <el-button type="danger" icon="el-icon-delete" class="white"
+                                   @click="handleDelete(scope.$index, scope.row)">删除
+                        </el-button>
+                    </template>
+                </el-table-column>
 
-                    </div>
+            </el-table>
+            <div class="pagination">
+                <el-pagination background @current-change="handleCurrentChange" layout="prev, pager, next"
+                               :total="(this.total)">
+                </el-pagination>
+            </div>
+        </div>
+
+    </div>
+
+    <!--<el-dialog title="编辑商品"-->
+               <!--:visible.sync="edit"-->
+               <!--@close="closingDiag"-->
+               <!--width="80%">-->
+        <!--<el-form :label-position="labelPosition" label-width="120px" :model="form" ref="form">-->
+            <!--<el-form-item label="商品名称" prop="name" required>-->
+                <!--<el-input v-model="form.name" autocomplete="off"></el-input>-->
+            <!--</el-form-item>-->
+            <!--<el-form-item label="单品价" prop="one" required>-->
+                <!--<el-input v-model="form.one" autocomplete="off"></el-input>-->
+            <!--</el-form-item>-->
+        <!--</el-form>-->
+        <!--<div slot="footer" class="dialog-footer">-->
+            <!--<el-button type="danger" @click="resetForm('form')">取消</el-button>-->
+            <!--<el-button type="primary" @click="editDo">保存</el-button>-->
+        <!--</div>-->
+    <!--</el-dialog>-->
 
 </template>
 
@@ -57,11 +82,11 @@
                 editVisible: false,
                 delVisible: false,
                 form: {
-                    autoid:'',
+                    autoid: '',
                     fun: '',
                     jid: '',
                     return: '',
-                    success:''
+                    success: ''
                 },
                 idx: -1
             }
@@ -69,26 +94,21 @@
         activated() {
             this.getData();
         },
-        mounted(){
+        mounted() {
             this.getData();
         },
         methods: {
-            statusFormat:function(row, column) {
+            statusFormat: function (row, column) {
                 var status = row[column.property];
                 if (status == undefined) {
                     return "";
                 }
                 var flag = '';
-                if (status == 1)
-                {
+                if (status == 1) {
                     flag = '正常'
-                }
-                else if (status == 2)
-                {
+                } else if (status == 2) {
                     flag = '完成'
-                }
-                else
-                {
+                } else {
                     flag = '取消'
                 }
                 return flag
@@ -126,14 +146,19 @@
                 return row.tag === value;
             },
             handleEdit(index, row) {
+                console.log("index" + index);
+                console.log("row" + row.siteId);
                 this.idx = index;
-                const item = this.tableData[index];
-                this.form = {
-                    JobId: item.JobId,
-                    sid: item.sid,
-                    status: item.status
-                }
+                // const item = this.tableData[index];
+                // this.form = {
+                //     JobId: item.JobId,
+                //     sid: item.sid,
+                //     status: item.status
+                // };
                 this.editVisible = true;
+            },
+            closingDiag: function () {
+                this.$emit('close-edit', true)
             },
             handleDelete(index, row) {
                 this.idx = index;
@@ -156,14 +181,16 @@
             saveEdit() {
                 this.$set(this.tableData, this.idx, this.form);
                 this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx+1} 行成功`);
+                this.$message.success(`修改第 ${this.idx + 1} 行成功`);
             },
             // 确定删除
-            deleteRow(){
+            deleteRow() {
                 this.tableData.splice(this.idx, 1);
                 this.$message.success('删除成功');
                 this.delVisible = false;
             }
+
+
         }
     };
 
@@ -183,15 +210,18 @@
         width: 300px;
         display: inline-block;
     }
-    .del-dialog-cnt{
+
+    .del-dialog-cnt {
         font-size: 16px;
         text-align: center
     }
-    .table{
+
+    .table {
         width: 100%;
         font-size: 14px;
     }
-    .red{
+
+    .red {
         color: #ff0000;
     }
 </style>
