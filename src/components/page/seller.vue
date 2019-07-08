@@ -12,6 +12,9 @@
                     <el-input v-model="select_word" placeholder="商家名称" class="handle-input mr10"></el-input>
 
                     <el-button type="warning" icon="search" :loading="loading_status" @click="search">搜索</el-button>
+
+                    <el-button type="primary" icon="search" :loading="loading_status" @click="insert">新增</el-button>
+
                 </div>
                 <el-table :data="tableData" border class="table" ref="multipleTable"
                           @selection-change="handleSelectionChange">
@@ -47,7 +50,7 @@
             </div>
 
             <!-- 编辑弹出框 -->
-            <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
+            <el-dialog title="编辑" :visible.sync="editVisible" width="30%" :close-on-click-modal="false">
                 <el-form ref="form" :model="editForm" label-width="100px">
                     <el-form-item label="商家名称:">
                         <el-input v-model="editForm.sellerName" :disabled="false"></el-input>
@@ -92,6 +95,85 @@
                             </span>
 
             </el-dialog>
+
+            <!-- 新增弹出框 -->
+            <el-dialog title="编辑" :visible.sync="insertVisible" width="60%" :close-on-click-modal="false">
+                <el-form ref="form"  label-width="100px">
+                    <el-form-item label="商家名称:">
+                        <el-input v-model="insertForm.sellerName"  :disabled="false"></el-input>
+                    </el-form-item>
+                    <el-form-item label="商家介绍:">
+                        <el-input v-model="insertForm.introduce" :disabled="false"></el-input>
+                    </el-form-item>
+                    <div class="statusClass">
+                        <el-form-item label="商家类别:">
+                            <el-select v-model="sellerStatuss" placeholder="请选择">
+                                <el-option
+                                        v-for="item in sellerStatus"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item.value" @change="getZoneCoursesetLists(item.value)">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+
+                        <el-form-item label="状态:">
+                            <el-select :placeholder="showInsertSellerStatus(insertForm)" @change="onInsertChangeStatus"
+                                       :remote-method="remoteMethod">
+                                <el-option
+                                        v-for="item in sellerStatus"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+
+                        <el-form-item label="是否通过审核:">
+                            <el-select :placeholder="showInsertSellerVerifyStatus(insertForm)" @change="onInsertChangeVerifyStatus"
+                                       :remote-method="remoteMethod">
+                                <el-option
+                                        v-for="item in sellerVerifyStatus"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item">
+                                </el-option>
+                            </el-select>
+                        </el-form-item>
+
+                    </div>
+                    <div>
+                    <el-form-item label="营业执照:">
+                    <img :src="insertForm.license" style="width: 100px; height: 100px" class="image"/>
+
+                    </el-form-item>
+                    <el-upload action="http://upload-z1.qiniup.com" :before-upload="beforeAvatarUpload" class="img-uploader" :data="qiNiuYunData" :on-success="handleSellerLicenseSuccess">
+                        <el-button size="small" type="primary" calss="upload-Button">点击上传</el-button>
+                    </el-upload>
+
+                        <el-form-item label="商家图片:">
+                            <img :src="insertForm.image" style="width: 100px; height: 100px" class="image"/>
+
+                        </el-form-item>
+                        <el-upload action="http://upload-z1.qiniup.com" :before-upload="beforeAvatarUpload" class="img-uploader" :data="qiNiuYunData" :on-success="handleSellerImageSuccess">
+                            <el-button size="small" type="primary" calss="upload-Button">点击上传</el-button>
+                        </el-upload>
+                    </div>
+                    <div>
+
+                    </div>
+                    <!--<el-form-item label="营业执照:">-->
+                        <!--<img :src="editForm.license" style="width: 100px; height: 100px" class="image"/>-->
+
+                    <!--</el-form-item>-->
+                </el-form>
+                <span slot="footer" class="dialog-footer">
+                            <el-button @click="editVisible = false">取 消</el-button>
+                            <el-button type="warning" @click="saveInsert(insertForm)">确 定</el-button>
+
+                            </span>
+
+            </el-dialog>
         </div>
     </el-col>
 </template>
@@ -105,6 +187,13 @@
                 url: '/xiaotao/seller/listSeller',
                 delUrl: '/xiaotao/seller/deleteByPrimaryKey',
                 updateUrl: '/xiaotao/seller//saveOrUpdate',
+                qiNiuYunTokenUrl: '/xiaotao/auth/getUpLoadToken',
+                qiNiuYunToken:'',
+                qiNiuYunUrl:'http://pu644r48l.bkt.clouddn.com',
+                qiNiuYunData:{
+                    key:'',
+                    token:''
+                },
                 tableData: [],
                 total: 0,
                 cur_page: 1,
@@ -117,11 +206,27 @@
                 editVisible: false,
                 delVisible: false,
                 editForm: [],
+                insertVisible: false,
+                insertForm:{
+                    sellerName:'',
+                    sellerStatus:'',
+                    introduce:'',
+                    license:'',
+                    isVerify:'',
+                    image:''
+                },
                 form: {
                     Id: '',
                     totalSum: ''
                 },
                 idx: -1,
+                sellerVerifyStatus:[{
+                    value: '0',
+                    label: '未通过'
+                }, {
+                    value: '1',
+                    label: '已通过'
+                }],
                 sellerStatus: [{
                     value: '0',
                     label: '无效'
@@ -255,10 +360,33 @@
                     return "有效";
                 }
             },
+            showInsertSellerStatus(insertForm){
+                if (insertForm.sellerStatus == null || insertForm.sellerStatus==''){
+                    return "请选择"
+                }
+                if (insertForm.sellerStatus == 0) {
+                    return "无效";
+                } else if (insertForm.sellerStatus == 1) {
+                    return "有效";
+                }
+            },
+            showInsertSellerVerifyStatus(insertForm){
+                if (insertForm.isVerify == undefined){
+                    return "请选择"
+                }
+                if (insertForm.isVerify == 0) {
+                    return "未通过";
+                } else if (insertForm.isVerify == 1) {
+                    return "已通过";
+                }
+            },
             onChangeStatus(event) {
                 this.editForm.sellerStatus = event.value;
                 // debugger
                 // console.log("下拉选中"+event.value)
+            },
+            onInsertChangeVerifyStatus(event){
+                this.insertForm.isVerify = event.value;
             },
             getZoneCoursesetLists(item) {
                 // console.log(item);
@@ -269,8 +397,80 @@
                 this.tableData.splice(this.idx, 1);
                 this.$message.success('删除成功');
                 this.delVisible = false;
+            },
+            insert() {
+                this.insertVisible = true;
+            },
+            saveInsert(insertFormData){
+
+                if (insertFormData.sellerName == ''){
+                    alert("商家名不能为空")
+                }
+                if (insertFormData.introduce == ''){
+                    alert("描述不能为空")
+                }
+                this.$axios.post(this.updateUrl, {
+
+                    // sellerId: data.sellerId,
+                    goodsType: 1,
+                    sellerName: insertFormData.sellerName,
+                    introduce: insertFormData.introduce,
+                    image: insertFormData.image,
+                    sellerStatus: insertFormData.sellerStatus,
+                    isVerify: insertFormData.isVerify
+                }).then((res) => {
+                    console.log("res" + res.data.code);
+                    if (res.data.code == 0) {
+                        alert("添加成功!")
+                    } else {
+                        alert("添加失败!")
+                    }
+                    this.insertVisible = false;
+                    this.insertForm = '';
+                    this.getData();
+                }).finally(this.loading_status = false)
+            },
+            onInsertChangeStatus(event){
+                this.insertForm.sellerStatus = event.value;
+            },
+            getQiniuToken: function() {
+                const _this = this;
+                this.$axios
+                    .get(this.qiNiuYunTokenUrl)
+                    .then((res) => {
+                        console.log("res" + res.data.code);
+                        if (res.data.code==0) {
+                            // this.qiNiuYunData.token=res.data.data;
+                            this.qiNiuYunData.token=res.data.data;
+                            // console.log("token:"+res.data.data)
+                            console.log("key:"+this.qiNiuYunData.key)
+                            console.log("token:"+this.qiNiuYunData.token)
+                        }
+                    });
+            },
+            //上传图片校验
+            beforeAvatarUpload(file) {
+                this.qiNiuYunData.key=file.name;
+                const isJPG = file.type === 'image/jpeg';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG) {
+                    this.$message.error('上传头像图片只能是 JPG 格式!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                this.getQiniuToken();
+                return isJPG && isLt2M;
+            },
+            handleSellerImageSuccess(res,file){
+                this.insertForm.image= this.qiNiuYunUrl+ "/"+file.name;
+            },
+            handleSellerLicenseSuccess(res,file){
+                this.insertForm.license= this.qiNiuYunUrl+ "/"+file.name;
             }
-        }
+        },
+
     };
 
 </script>
@@ -302,5 +502,24 @@
 
     .red {
         color: #ff0000;
+    }
+    .img-uploader{
+        text-align: center;
+        /*height: 80px !important;*/
+        width: 360px !important;
+        /*height: 0px;*/
+        margin-right: 20px;
+    }
+    .upload-Button{
+        margin-right: 20px;
+        text-align: center;
+        height: 80px !important;
+        width: 32px;
+        border: none !important
+    }
+
+    .statusClass{
+        horiz-align: right;
+
     }
 </style>

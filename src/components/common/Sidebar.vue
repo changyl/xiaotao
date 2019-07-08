@@ -108,8 +108,22 @@
                         ]
                     },
                     {
-                        icon: 'el-icon-lx-shopfill',
+                        icon: 'el-icon-lx-goodsfill',
                         index: '5',
+                        title: '商品分类管理',
+                        subs: [
+
+                            {
+
+                                index: '/goods/listCategory',
+                                title: '商品分类列表'
+                            }
+                        ]
+                    },
+
+                    {
+                        icon: 'el-icon-lx-shopfill',
+                        index: '6',
                         title: '商家管理',
                         subs: [
                             {
@@ -121,7 +135,7 @@
                     },
                     {
                         icon: 'el-icon-lx-location',
-                        index: '6',
+                        index: '7',
                         title: '收货地址管理',
                         subs: [
                             {
@@ -133,7 +147,7 @@
                     },
                     {
                         icon: 'el-icon-lx-global',
-                        index: '7',
+                        index: '8',
                         title: '常用线路管理',
                         subs: [
                             {
@@ -145,7 +159,7 @@
                     },
                     {
                         icon: 'el-icon-lx-locationfill',
-                        index: '8',
+                        index: '9',
                         title: '地点管理',
                         subs: [
                             {

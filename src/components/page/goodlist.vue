@@ -7,6 +7,7 @@
                 <el-input v-model="select_word2" placeholder="商家名称" class="handle-input mr10"></el-input>
                 <el-input v-model="select_word3" placeholder="商家标题" class="handle-input mr10"></el-input>
                 <el-button type="warning" icon="search" :loading="loading_status" @click="search">搜索</el-button>
+                <el-button type="primary" icon="insert" @click="insert">新增</el-button>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable"
                       @selection-change="handleSelectionChange">
@@ -41,15 +42,7 @@
                 </el-pagination>
             </div>
         </div>
-        <div>
-            <el-alert
-                    :visible.sync="updateSuccessVisible"
-                    title="成功提示的文案"
-                    type="success"
-                    center
-                    show-icon>
-            </el-alert>
-        </div>
+
         <div>
             <el-dialog title="编辑"
                        :visible.sync="editFormVisible"
@@ -78,15 +71,31 @@
                             <!--<img :src="editForm.coverImage" alt="" style="width: 36px;height:36px">-->
                             <img :src="editForm.coverImage" min-width="70" height="70"/>
                         </el-form-item>
+
+                        <el-upload :action="uploadActionUrl" :before-upload="beforeAvatarUpload" class="img-uploader">
+                            <el-button size="small" type="primary" calss="upload-Button">点击上传</el-button>
+                        </el-upload>
                     </div>
 
                     <div>
-                        <el-form-item label="上下架:" prop="onsale">
-                            <!--<el-input v-model="editForm.onsale"  auto-complete="off"></el-input>-->
+                        <!--<el-form-item label="上下架:" prop="onsale">-->
+                        <!--&lt;!&ndash;<el-input v-model="editForm.onsale"  auto-complete="off"></el-input>&ndash;&gt;-->
 
-                            <el-radio v-model="radio" label="1" check="editForm.onsale">上架</el-radio>
-                            <el-radio v-model="radio" label="2" check="editForm.onsale">下架</el-radio>
+                        <!--<el-radio v-model="radio" name="onsale" label="1" check="editForm.onsale">上架</el-radio>-->
+                        <!--<el-radio v-model="radio" name="onsale" label="0" check="editForm.onsale">下架</el-radio>-->
 
+                        <!--</el-form-item>-->
+
+                        <el-form-item label="上下架:">
+                            <el-select :placeholder="showOnSaleStatus(editForm)" @change="onEditChangeOnsaleStatus"
+                                       :remote-method="remoteMethod">
+                                <el-option
+                                        v-for="item in onsaleStatus"
+                                        :key="item.value"
+                                        :label="item.label"
+                                        :value="item">
+                                </el-option>
+                            </el-select>
                         </el-form-item>
                     </div>
                 </el-form>
@@ -96,6 +105,86 @@
                 </div>
             </el-dialog>
         </div>
+
+        <el-dialog title="新增" :visible.sync="insertVisible" width="60%" :close-on-click-modal="false">
+            <el-form ref="form"  label-width="100px">
+                <el-form-item label="商品标题:">
+                    <el-input v-model="insertGoodsForm.title"  :disabled="false"></el-input>
+                </el-form-item>
+                <el-form-item label="商品简称:">
+                    <el-input v-model="insertGoodsForm.abbreviation" :disabled="false"></el-input>
+                </el-form-item>
+                <div class="statusClass">
+                    <el-form-item label="是否通过审核:">
+                        <el-select :placeholder="showInsertGoodsOnsaleStatus(insertGoodsForm)" @change="onInsertChangeOnsaleStatus"
+                                   :remote-method="remoteMethod">
+                            <el-option
+                                    v-for="item in onsaleStatus"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
+
+                    <!--<el-form-item label="状态:">-->
+                        <!--<el-select :placeholder="showInsertSellerStatus(insertForm)" @change="onInsertChangeStatus"-->
+                                   <!--:remote-method="remoteMethod">-->
+                            <!--<el-option-->
+                                    <!--v-for="item in sellerStatus"-->
+                                    <!--:key="item.value"-->
+                                    <!--:label="item.label"-->
+                                    <!--:value="item">-->
+                            <!--</el-option>-->
+                        <!--</el-select>-->
+                    <!--</el-form-item>-->
+
+                    <!--<el-form-item label="是否通过审核:">-->
+                        <!--<el-select :placeholder="showInsertSellerVerifyStatus(insertForm)" @change="onInsertChangeVerifyStatus"-->
+                                   <!--:remote-method="remoteMethod">-->
+                            <!--<el-option-->
+                                    <!--v-for="item in sellerVerifyStatus"-->
+                                    <!--:key="item.value"-->
+                                    <!--:label="item.label"-->
+                                    <!--:value="item">-->
+                            <!--</el-option>-->
+                        <!--</el-select>-->
+                    <!--</el-form-item>-->
+
+                </div>
+                <div>
+                    <el-form-item label="封面图:">
+                        <img :src="insertGoodsForm.coverImage" style="width: 100px; height: 100px" class="image"/>
+
+                    </el-form-item>
+                    <el-upload :action="uploadActionUrl" :before-upload="beforeAvatarUpload" class="img-uploader">
+                        <el-button size="small" type="primary" calss="upload-Button">点击上传</el-button>
+                    </el-upload>
+
+                    <!--<el-form-item label="商家图片:">-->
+                        <!--<img :src="insertGoodsForm.image" style="width: 100px; height: 100px" class="image"/>-->
+
+                    <!--</el-form-item>-->
+                    <!--<el-upload :action="uploadActionUrl" :before-upload="beforeAvatarUpload" class="img-uploader">-->
+                        <!--<el-button size="small" type="primary" calss="upload-Button">点击上传</el-button>-->
+                    <!--</el-upload>-->
+                </div>
+                <div>
+
+                </div>
+                <!--<el-form-item label="营业执照:">-->
+                <!--<img :src="editForm.license" style="width: 100px; height: 100px" class="image"/>-->
+
+                <!--</el-form-item>-->
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                            <el-button @click="editVisible = false">取 消</el-button>
+                            <el-button type="warning" @click="saveInsert(insertForm)">确 定</el-button>
+
+                            </span>
+
+        </el-dialog>
+
     </div>
 
 </template>
@@ -108,7 +197,7 @@
                 message: 'first',
                 url: '/xiaotao/goods/listGoods',
                 updateUrl: 'xiaotao/goods/saveOrUpdate',
-                delUrl:'/xiaotao/goods/deleteByPrimaryKey',
+                delUrl: '/xiaotao/goods/deleteByPrimaryKey',
                 tableData: [],
                 total: 0,
                 cur_page: 1,
@@ -126,6 +215,18 @@
                 editFormVisible: false,
                 updateSuccessVisible: false,
                 editForm: [],
+
+                insertGoodsForm:{
+                    coverImage:'',
+                    title:'',
+                    onsale:'',
+                    sellerId:'',
+                    price:'',
+                    abbreviation:'',
+                    carousels:'',
+                    content:'',
+                    categoryId:''
+                },
                 form: {
                     autoid: '',
                     fun: '',
@@ -133,7 +234,15 @@
                     return: '',
                     success: ''
                 },
-                idx: -1
+                onsaleStatus: [{
+                    value: '0',
+                    label: '下架'
+                }, {
+                    value: '1',
+                    label: '上架'
+                }],
+                idx: -1,
+                insertVisible:false
             }
         },
         activated() {
@@ -143,7 +252,7 @@
             this.getData();
         },
 
-        load(){
+        load() {
             this.getData();
         },
 
@@ -190,6 +299,10 @@
                     this.total = res.data.data.size;
                     this.loading_status = false;
                 }).finally(this.loading_status = false)
+            },
+            insert(){
+                console.log("打开新增窗口");
+                this.insertVisible = true;
             },
             formatter(row, column) {
                 return row.address;
@@ -251,6 +364,52 @@
                 console.log("取消");
                 this.editFormVisible = false;
             },
+            showOnSaleStatus(formData) {
+                console.log("formData:"+formData.onsale);
+                if (formData.onsale == undefined ) {
+                    return "请选择";
+                }
+                if (formData.onsale == 1) {
+                    return "上架";
+                }
+                if (formData.onsale == 0) {
+                    console.log()
+                    return "下架";
+                }
+            },showInsertGoodsOnsaleStatus(insertGoodsForm){
+                if (insertGoodsForm.onsale == undefined ){
+                    return "请选择"
+                }
+                if (insertGoodsForm.onsale == 0) {
+                    return "下架";
+                } else if (insertGoodsForm.onsale == 1) {
+                    return "上架";
+                }
+            },
+            onChangeStatus(event) {
+                this.editForm.sellerStatus = event.value;
+                // debugger
+                // console.log("下拉选中"+event.value)
+            },
+            onEditChangeOnsaleStatus(event) {
+                this.editForm.onsale = event.value;
+            },
+            onInsertChangeOnsaleStatus(event){
+                this.insertGoodsForm.onsale = event.value;
+            },
+            //上传图片校验
+            beforeAvatarUpload(file) {
+                const isJPG = file.type === 'image/jpeg';
+                const isLt2M = file.size / 1024 / 1024 < 2;
+
+                if (!isJPG) {
+                    this.$message.error('上传头像图片只能是 JPG 格式!');
+                }
+                if (!isLt2M) {
+                    this.$message.error('上传头像图片大小不能超过 2MB!');
+                }
+                return isJPG && isLt2M;
+            },
             handleUpdate(data) {
                 this.loading_status = true;
                 this.$axios.post(this.updateUrl, {
@@ -258,8 +417,9 @@
                     title: data.title,
                     abbreviation: data.abbreviation,
                     goodsId: data.goodsId,
-                    price: data.price
-
+                    price: data.price,
+                    coverImage:data.coverImage,
+                    onsale:data.onsale
                 }).then((res) => {
                     console.log("res" + res.data.code);
                     if (res.data.code == 0) {
@@ -268,10 +428,13 @@
                         alert("修改失败!")
                     }
                     this.editFormVisible = false;
+                    this.editForm = [];
+                    this.getData();
                 }).finally(this.loading_status = false)
             }
         }
-    };
+    }
+    ;
 
 </script>
 

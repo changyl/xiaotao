@@ -65,6 +65,11 @@ export default new Router({
                     meta: { auth:true,keepAlive: false,title: '商品列表' }
                 },
                 {
+                    path: '/goods/listCategory',
+                    component: resolve => require(['../components/page/goodCategoryList.vue'], resolve),
+                    meta: { auth:true,keepAlive: false,title: '商品分类列表' }
+                },
+                {
                     path: '/commonline/listCommonLine',
                     component: resolve => require(['../components/page/listCommonLine.vue'], resolve),
                     meta: { auth:true,keepAlive: false,title: '常用路线列表' }
