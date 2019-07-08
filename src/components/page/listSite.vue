@@ -16,12 +16,16 @@
                 <el-button type="warning" icon="search" :loading="loading_status" @click="search">搜索</el-button>
                 <el-button type="primary" icon="insert" @click="insert">新增</el-button>
             </div>
-            <el-table :data="tableData" border class="table" ref="multipleTable"
+            <el-table :data="tableData" border class="table" ref="multipleTable" 
                       @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="siteId" label="ID" sortable></el-table-column>
                 <el-table-column prop="siteName" label="名称"></el-table-column>
-                <el-table-column prop="status" label="状态"></el-table-column>
+                <el-table-column prop="status" label="状态">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.status == '1' ? '有效' : '已删除' }}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="updateTime" label="更新时间"></el-table-column>
                 <el-table-column prop="createTime" label="创建时间"></el-table-column>
                 <!--<el-table-column prop="caozuo" label="操作" ></el-table-column>-->
@@ -123,7 +127,7 @@
                 } else {
                     flag = '取消'
                 }
-                return flag
+                return flag;
             },
             // 分页导航
             handleCurrentChange(val) {

@@ -15,7 +15,11 @@
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="commonlineId" label="线路ID" sortable ></el-table-column>
                 <el-table-column prop="name" label="线路名"  ></el-table-column>
-                <el-table-column prop="status" label="状态" ></el-table-column>
+                <el-table-column prop="status" label="状态" >
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.status == 1 ? '有效' : '已删除' }}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="userId" label="用户ID"  ></el-table-column>
                 <el-table-column prop="wyPlace" label="途径地点"  ></el-table-column>
                 <el-table-column prop="startPlace" label="出发地点"></el-table-column>

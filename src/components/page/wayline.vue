@@ -27,10 +27,18 @@
                 <el-table-column prop="endPlace" label="目的地"></el-table-column>
                 <el-table-column prop="number" label="人数"></el-table-column>
                 <el-table-column prop="phone" label="手机号"></el-table-column>
-                <el-table-column prop="lineType" label="类型"></el-table-column>
+                <el-table-column prop="lineType" label="类型">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.lineType == '1' ? '车找人' : '人找车' }}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="updateTime" label="更新时间"></el-table-column>
                 <el-table-column prop="createTime" label="创建时间"></el-table-column>
-                <el-table-column prop="status" label="状态"></el-table-column>
+                <el-table-column prop="status" label="状态">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.status == '1' ? '有效' : '已删除' }}</span>
+                    </template>
+                </el-table-column>
                 <!--<el-table-column prop="caozuo" label="操作" ></el-table-column>-->
                 <el-table-column label="操作" align="center">
                     <template slot-scope="scope">

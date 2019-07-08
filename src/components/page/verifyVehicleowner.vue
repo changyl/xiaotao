@@ -26,10 +26,18 @@
                 <el-table-column prop="idCardBack" label="身份证反面"></el-table-column>
                 <el-table-column prop="driverCardfront" label="驾驶证正面"></el-table-column>
                 <el-table-column prop="driverCardback" label="驾驶证反面"></el-table-column>
-                <el-table-column prop="isVerify" label="审核通过"></el-table-column>
+                <el-table-column prop="isVerify" label="审核状态">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.isVerify == '1' ? '通过' : (scope.row.isVerify == '0' ? '拒绝' : '未审核') }}</span>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="createTime" label="创建时间"></el-table-column>
                 <el-table-column prop="updateTime" label="更新时间"></el-table-column>
-                <el-table-column prop="status" label="状态"></el-table-column>
+                <el-table-column prop="status" label="状态">
+                    <template slot-scope="scope">
+                        <span>{{ scope.row.status == '1' ? '有效' : '已删除' }}</span>
+                    </template>
+                </el-table-column>
                 <!--<el-table-column prop="caozuo" label="操作" ></el-table-column>-->
                 <el-table-column label="操作" align="center">
                     <template slot-scope="scope">
