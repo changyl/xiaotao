@@ -12,18 +12,25 @@
                 <!--<el-option key="5" label="failed" value="3"></el-option>-->
                 <!--<el-option key="6" label="error" value="4"></el-option>-->
                 <!--</el-select>-->
-                <el-input v-model="select_word" placeholder="地点名称" class="handle-input mr10"></el-input>
+                <el-input v-model="select_word" placeholder="顺道名称" class="handle-input mr10"></el-input>
                 <el-button type="warning" icon="search" :loading="loading_status" @click="search">搜索</el-button>
                 <el-button type="primary" icon="insert" @click="insert">新增</el-button>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable"
                       @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
-                <el-table-column prop="siteId" label="ID" sortable></el-table-column>
-                <el-table-column prop="siteName" label="名称"></el-table-column>
-                <el-table-column prop="status" label="状态"></el-table-column>
+                <el-table-column prop="waylineId" label="ID" sortable></el-table-column>
+                <el-table-column prop="userId" label="用户ID"></el-table-column>
+                <el-table-column prop="appointmentTime" label="预约时间"></el-table-column>
+                <el-table-column prop="startPlace" label="出发地"></el-table-column>
+                <el-table-column prop="wayPlace" label="途径地"></el-table-column>
+                <el-table-column prop="endPlace" label="目的地"></el-table-column>
+                <el-table-column prop="number" label="人数"></el-table-column>
+                <el-table-column prop="phone" label="手机号"></el-table-column>
+                <el-table-column prop="lineType" label="类型"></el-table-column>
                 <el-table-column prop="updateTime" label="更新时间"></el-table-column>
                 <el-table-column prop="createTime" label="创建时间"></el-table-column>
+                <el-table-column prop="status" label="状态"></el-table-column>
                 <!--<el-table-column prop="caozuo" label="操作" ></el-table-column>-->
                 <el-table-column label="操作" align="center">
                     <template slot-scope="scope">
@@ -44,11 +51,32 @@
         </div>
 
         <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-                    <el-form ref="form" :model="editForm" label-width="100px">
-                        <el-form-item label="地点名称" prop="siteName" required>
-                            <el-input v-model="editForm.siteName" autocomplete="off"></el-input>
-                        </el-form-item>
-                    </el-form>
+            <el-form ref="form" :model="editForm" label-width="100px">
+                <el-form-item label="UserID" prop="userId" required>
+                    <el-input v-model="editForm.userId" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="预约时间" prop="appointmentTime" required>
+                    <el-input v-model="editForm.appointmentTime" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="出发地" prop="startPlace" required>
+                    <el-input v-model="editForm.startPlace" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="途径地" prop="wayPlace" required>
+                    <el-input v-model="editForm.wayPlace" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="目的地" prop="endPlace" required>
+                    <el-input v-model="editForm.endPlace" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="人数" prop="number" required>
+                    <el-input v-model="editForm.number" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="手机号" prop="phone" required>
+                    <el-input v-model="editForm.phone" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="类型" prop="lineType" required>
+                    <el-input v-model="editForm.lineType" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button type="danger" @click="closeEdit()">取消</el-button>
                 <el-button type="primary" @click="saveEdit(editForm)">保存</el-button>
@@ -57,8 +85,29 @@
 
         <el-dialog title="新增" :visible.sync="insertVisible" width="30%">
             <el-form ref="form" :model="insertForm" label-width="100px">
-                <el-form-item label="地点名称" prop="siteName" required>
-                    <el-input v-model="insertForm.siteName" autocomplete="off"></el-input>
+                <el-form-item label="UserID" prop="userId" required>
+                    <el-input v-model="insertForm.userId" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="预约时间" prop="appointmentTime" required>
+                    <el-input v-model="insertForm.appointmentTime" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="出发地" prop="startPlace" required>
+                    <el-input v-model="insertForm.startPlace" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="途径地" prop="wayPlace" required>
+                    <el-input v-model="insertForm.wayPlace" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="目的地" prop="endPlace" required>
+                    <el-input v-model="insertForm.endPlace" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="人数" prop="number" required>
+                    <el-input v-model="insertForm.number" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="手机号" prop="phone" required>
+                    <el-input v-model="insertForm.phone" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="类型" prop="lineType" required>
+                    <el-input v-model="insertForm.lineType" autocomplete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -77,9 +126,9 @@
         data() {
             return {
                 message: 'first',
-                url: '/xiaotao/site/listSite',
-                updateUrl: '/xiaotao/site/saveOrUpdateSite',
-                deleteUrl: '/xiaotao/site/deleteSite',
+                url: '/xiaotao/wayLine/listWayLine',
+                updateUrl: '/xiaotao/wayLine/saveOrUpdateWayLine',
+                deleteUrl: '/xiaotao/wayLine/deleteByPrimaryKey',
                 tableData: [],
                 total: 0,
                 cur_page: 1,
@@ -169,7 +218,14 @@
             saveInsert(data) {
                 this.$set(this.tableData, this.idx, data);
                 this.$axios.post(this.updateUrl, {
-                    siteName: data.siteName
+                    userId: data.userId,
+                    appointmentTime: data.appointmentTime,
+                    startPlace: data.startPlace,
+                    wayPlace: data.wayPlace,
+                    endPlace: data.endPlace,
+                    number: data.number,
+                    phone: data.phone,
+                    lineType: data.lineType
                 }).then((res) => {
                     console.log("res" + res.data.code);
                     if (res.data.code == 0) {
@@ -197,12 +253,17 @@
             // 保存编辑
             saveEdit(data) {
                 this.$set(this.tableData, this.idx, data);
-                console.log(data.siteName);
                 this.$axios.post(this.updateUrl, {
-                    siteId: data.siteId,
-                    siteName: data.siteName
+                    waylineId: data.waylineId,
+                    userId: data.userId,
+                    appointmentTime: data.appointmentTime,
+                    startPlace: data.startPlace,
+                    wayPlace: data.wayPlace,
+                    endPlace: data.endPlace,
+                    number: data.number,
+                    phone: data.phone,
+                    lineType: data.lineType
                 }).then((res) => {
-                    console.log("res" + res.data.code);
                     if (res.data.code == 0) {
                         alert("修改成功!");
                     } else {
@@ -218,8 +279,9 @@
             //  删除
             handleDelete(index, row) {
                 const item = this.tableData[index];
+                console.log(item.waylineId);
                 this.$axios.post(this.deleteUrl, {
-                    siteId: item.siteId
+                    waylineId: item.waylineId
                 }).then((res) => {
                     if (res.data.code == 0) {
                         alert("删除成功!");

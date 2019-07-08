@@ -166,6 +166,11 @@
 
                                 index: '/site/listSite',
                                 title: '地点列表'
+                            },
+                            {
+
+                                index: '/wayLine/listWayLine',
+                                title: '顺道列表'
                             }
                         ]
                     },

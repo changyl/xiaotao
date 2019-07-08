@@ -80,6 +80,11 @@ export default new Router({
                     meta: { auth:true,keepAlive: false,title: '地点列表' }
                 },
                 {
+                    path: '/wayLine/listWayLine',
+                    component: resolve => require(['../components/page/wayline.vue'], resolve),
+                    meta: { auth:true,keepAlive: false,title: '顺道列表' }
+                },
+                {
                     path: '/address/list',
                     component: resolve => require(['../components/page/addrlist.vue'], resolve),
                     meta: { auth:true,keepAlive: false,title: '收货地址列表' }
