@@ -35,6 +35,16 @@ export default new Router({
                     meta: { auth:true,keepAlive: false,title: '角色列表' }
                 },
                 {
+                    path: '/vehicleowner/vehicleowner',
+                    component: resolve => require(['../components/page/vehicleowner.vue'], resolve),
+                    meta: { auth:true,keepAlive: false,title: '司机列表' }
+                },
+                {
+                    path: '/vehicleowner/verifyVehicleowner',
+                    component: resolve => require(['../components/page/verifyVehicleowner.vue'], resolve),
+                    meta: { auth:true,keepAlive: false,title: '司机审核' }
+                },
+                {
                     path: '/order/list',
                     component: resolve => require(['../components/page/order.vue'], resolve),
                     meta: { auth:true,keepAlive: false,title: '订单列表' }

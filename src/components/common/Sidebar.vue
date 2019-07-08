@@ -174,6 +174,23 @@
                             }
                         ]
                     },
+                    {
+                        icon: 'el-icon-lx-group',
+                        index: '10',
+                        title: '司机管理',
+                        subs: [
+                            {
+
+                                index: '/vehicleowner/vehicleowner',
+                                title: '司机列表'
+                            },
+                            {
+
+                                index: '/vehicleowner/verifyVehicleowner',
+                                title: '司机审核'
+                            }
+                        ]
+                    },
                     // {
                     //     icon: 'el-icon-lx-file',
                     //     index: '15',
