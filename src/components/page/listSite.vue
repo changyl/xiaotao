@@ -14,6 +14,7 @@
                 <!--</el-select>-->
                 <el-input v-model="select_word" placeholder="地点名称" class="handle-input mr10"></el-input>
                 <el-button type="warning" icon="search" :loading="loading_status" @click="search">搜索</el-button>
+                <el-button type="primary" icon="insert" @click="insert">新增</el-button>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable"
                       @selection-change="handleSelectionChange">
@@ -42,25 +43,31 @@
             </div>
         </div>
 
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
+                    <el-form ref="form" :model="editForm" label-width="100px">
+                        <el-form-item label="地点名称" prop="one" required>
+                            <el-input v-model="editForm.siteName" autocomplete="off"></el-input>
+                        </el-form-item>
+                    </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="danger" @click="closeEdit()">取消</el-button>
+                <el-button type="primary" @click="saveEdit(editForm)">保存</el-button>
+            </div>
+        </el-dialog>
+
+        <el-dialog title="新增" :visible.sync="insertVisible" width="30%">
+            <el-form ref="form" :model="insertForm" label-width="100px">
+                <el-form-item label="地点名称" prop="one" required>
+                    <el-input v-model="insertForm.siteName" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="danger" @click="closeInsert()">取消</el-button>
+                <el-button type="primary" @click="saveInsert(insertForm)">保存</el-button>
+            </div>
+        </el-dialog>
     </div>
 
-    <!--<el-dialog title="编辑商品"-->
-               <!--:visible.sync="edit"-->
-               <!--@close="closingDiag"-->
-               <!--width="80%">-->
-        <!--<el-form :label-position="labelPosition" label-width="120px" :model="form" ref="form">-->
-            <!--<el-form-item label="商品名称" prop="name" required>-->
-                <!--<el-input v-model="form.name" autocomplete="off"></el-input>-->
-            <!--</el-form-item>-->
-            <!--<el-form-item label="单品价" prop="one" required>-->
-                <!--<el-input v-model="form.one" autocomplete="off"></el-input>-->
-            <!--</el-form-item>-->
-        <!--</el-form>-->
-        <!--<div slot="footer" class="dialog-footer">-->
-            <!--<el-button type="danger" @click="resetForm('form')">取消</el-button>-->
-            <!--<el-button type="primary" @click="editDo">保存</el-button>-->
-        <!--</div>-->
-    <!--</el-dialog>-->
 
 </template>
 
@@ -71,6 +78,8 @@
             return {
                 message: 'first',
                 url: '/xiaotao/site/listSite',
+                updateUrl: '/xiaotao/site/saveOrUpdateSite',
+                deleteUrl: '/xiaotao/site/deleteSite',
                 tableData: [],
                 total: 0,
                 cur_page: 1,
@@ -81,6 +90,7 @@
                 loading_status: false,
                 editVisible: false,
                 delVisible: false,
+                editForm:[],
                 form: {
                     autoid: '',
                     fun: '',
@@ -88,7 +98,9 @@
                     return: '',
                     success: ''
                 },
-                idx: -1
+                idx: -1,
+                insertVisible: false,
+                insertForm: []
             }
         },
         activated() {
@@ -128,6 +140,7 @@
                     this.total = res.data.data.size;
                 })
             },
+            //  搜索查询
             search() {
                 this.loading_status = true;
                 this.$axios.get(this.url, {
@@ -145,24 +158,77 @@
             filterTag(value, row) {
                 return row.tag === value;
             },
+            //  打开新增窗口
+            insert() {
+                this.insertVisible = true;
+            },
+            closeInsert() {
+                this.insertVisible = false;
+            },
+            //  保存新增
+            saveInsert(data) {
+                this.$set(this.tableData, this.idx, data);
+                this.$axios.post(this.updateUrl, {
+                    siteName: data.siteName
+                }).then((res) => {
+                    console.log("res" + res.data.code);
+                    if (res.data.code == 0) {
+                        alert("添加成功!");
+                        this.search();
+                    } else {
+                        alert("添加失败!");
+                    }
+                    this.insertVisible = false;
+                }).finally(this.loading_status = false)
+            },
+            //  打开编辑
             handleEdit(index, row) {
-                console.log("index" + index);
-                console.log("row" + row.siteId);
                 this.idx = index;
-                // const item = this.tableData[index];
-                // this.form = {
-                //     JobId: item.JobId,
-                //     sid: item.sid,
-                //     status: item.status
-                // };
+                const item = this.tableData[index];
+                this.form = {
+                    siteId: item.Id,
+                    totalSum: item.totalSum,
+                    modifiedTime: item.modifiedTime
+                }
                 this.editVisible = true;
+                this.editForm = Object.assign({}, row);
+                console.log(this.editForm)
+            },
+            // 保存编辑
+            saveEdit(data) {
+                this.$set(this.tableData, this.idx, data);
+                console.log(data.siteName);
+                this.$axios.post(this.updateUrl, {
+                    siteId: data.siteId,
+                    siteName: data.siteName
+                }).then((res) => {
+                    console.log("res" + res.data.code);
+                    if (res.data.code == 0) {
+                        alert("修改成功!");
+                    } else {
+                        alert("修改失败!");
+                    }
+                    this.editVisible = false;
+                    this.search();
+                }).finally(this.loading_status = false)
             },
             closingDiag: function () {
                 this.$emit('close-edit', true)
             },
+            //  删除
             handleDelete(index, row) {
-                this.idx = index;
-                this.delVisible = true;
+                const item = this.tableData[index];
+                this.$axios.post(this.deleteUrl, {
+                    siteId: item.siteId
+                }).then((res) => {
+                    if (res.data.code == 0) {
+                        alert("删除成功!");
+                        this.search();
+                    } else {
+                        alert("删除失败!");
+                    }
+                    this.editVisible = false;
+                }).finally(this.loading_status = false)
             },
             delAll() {
                 const length = this.multipleSelection.length;
@@ -177,17 +243,22 @@
             handleSelectionChange(val) {
                 this.multipleSelection = val;
             },
-            // 保存编辑
-            saveEdit() {
-                this.$set(this.tableData, this.idx, this.form);
-                this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx + 1} 行成功`);
-            },
             // 确定删除
             deleteRow() {
-                this.tableData.splice(this.idx, 1);
-                this.$message.success('删除成功');
-                this.delVisible = false;
+                this.$axios.post(this.deleteUrl, {
+                    siteId: data.siteId
+                }).then((res) => {
+                    if (res.data.code == 0) {
+                        alert("删除成功!");
+                        this.search();
+                    } else {
+                        alert("删除失败!");
+                    }
+                    this.editVisible = false;
+                }).finally(this.loading_status = false)
+            },
+            closeEdit(){
+                this.editVisible = false;
             }
 
 
