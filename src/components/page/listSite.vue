@@ -171,6 +171,11 @@
             },
             //  保存新增
             saveInsert(data) {
+                if (data.siteName == null || data.siteName == '') {
+                    alert("地点名称不能为空");
+                    return;
+                }
+                
                 this.$set(this.tableData, this.idx, data);
                 this.$axios.post(this.updateUrl, {
                     siteName: data.siteName
@@ -201,6 +206,11 @@
             // 保存编辑
             saveEdit(data) {
                 this.$set(this.tableData, this.idx, data);
+                if (data.siteName == null || data.siteName == '') {
+                    alert("地点名称不能为空");
+                    return;
+                }
+                
                 console.log(data.siteName);
                 this.$axios.post(this.updateUrl, {
                     siteId: data.siteId,

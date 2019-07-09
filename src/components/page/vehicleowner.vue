@@ -233,7 +233,7 @@
                         alert("添加成功!");
                         this.search();
                     } else {
-                        alert("添加失败!");
+                        alert(res.data.message);
                     }
                     this.insertVisible = false;
                 }).finally(this.loading_status = false)
@@ -254,6 +254,7 @@
             // 保存编辑
             saveEdit(data) {
                 this.$set(this.tableData, this.idx, data);
+                
                 this.$axios.post(this.updateUrl, {
                     vehicleownerId: data.vehicleownerId,
                     userId: data.userId,

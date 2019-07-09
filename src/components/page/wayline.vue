@@ -81,8 +81,20 @@
                 <el-form-item label="手机号" prop="phone" required>
                     <el-input v-model="editForm.phone" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="类型" prop="lineType" required>
+                <!--<el-form-item label="类型" prop="lineType" required>
                     <el-input v-model="editForm.lineType" autocomplete="off"></el-input>
+                </el-form-item>-->
+                <el-form-item label="类型" required>
+                    <el-select v-model="editForm.lineType" placeholder="请选择类型">
+                        <el-option-group>
+                            <el-option
+                                    v-for="item in lineTypeArr"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                            </el-option>
+                        </el-option-group>
+                    </el-select>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -115,7 +127,16 @@
                     <el-input v-model="insertForm.phone" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="类型" prop="lineType" required>
-                    <el-input v-model="insertForm.lineType" autocomplete="off"></el-input>
+                    <el-select v-model="insertForm.lineType" placeholder="请选择类型">
+                        <el-option-group>
+                            <el-option
+                                    v-for="item in lineTypeArr"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                            </el-option>
+                        </el-option-group>
+                    </el-select>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -157,7 +178,17 @@
                 },
                 idx: -1,
                 insertVisible: false,
-                insertForm: []
+                insertForm: [],
+                lineTypeArr: [
+                    {
+                        value: '1',
+                        label: '车找人'
+                    },
+                    {
+                        value: '0',
+                        label: '人找车'
+                    }
+                ]
             }
         },
         activated() {
@@ -224,6 +255,9 @@
             },
             //  保存新增
             saveInsert(data) {
+                //  参数校验
+                if (!this.checkParam(data)) {return;}
+                
                 this.$set(this.tableData, this.idx, data);
                 this.$axios.post(this.updateUrl, {
                     userId: data.userId,
@@ -245,6 +279,42 @@
                     this.insertVisible = false;
                 }).finally(this.loading_status = false)
             },
+            //  参数校验
+            checkParam(data) {
+                if (data.userId == null || data.userId == '') {
+                    alert("用户ID不能为空");
+                    return false;
+                }
+                if (data.appointmentTime == null || data.appointmentTime == '') {
+                    alert("预约时间不能为空");
+                    return false;
+                }
+                if (data.startPlace == null || data.startPlace == '') {
+                    alert("出发地不能为空");
+                    return false;
+                }
+                if (data.wayPlace == null || data.wayPlace == '') {
+                    alert("途径地不能为空");
+                    return false;
+                }
+                if (data.endPlace == null || data.endPlace == '') {
+                    alert("目的地不能为空");
+                    return false;
+                }
+                if (data.number == null || data.number == '') {
+                    alert("人数不能为空");
+                    return false;
+                }
+                if (data.phone == null || data.phone == '') {
+                    alert("手机号不能为空");
+                    return false;
+                }
+                if (data.lineType == null || data.lineType == '') {
+                    alert("类型不能为空");
+                    return false;
+                }
+                return true;
+            },
             //  打开编辑
             handleEdit(index, row) {
                 this.idx = index;
@@ -260,6 +330,9 @@
             },
             // 保存编辑
             saveEdit(data) {
+                //  参数校验
+                if (!this.checkParam(data)) {return;}
+                
                 this.$set(this.tableData, this.idx, data);
                 this.$axios.post(this.updateUrl, {
                     waylineId: data.waylineId,
