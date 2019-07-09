@@ -64,7 +64,13 @@
                     <el-input v-model="editForm.userId" autocomplete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="预约时间" prop="appointmentTime" required>
-                    <el-input v-model="editForm.appointmentTime" autocomplete="off"></el-input>
+                    <el-date-picker
+                            v-model="editForm.appointmentTime"
+                            type="date"
+                            placeholder="选择日期"
+                            :picker-options="appointmentTime">
+                        <!--{{ moment(editForm.appointmentTime).format("YYYY-MM-DD HH:mm:ss") }}-->
+                    </el-date-picker>
                 </el-form-item>
                 <el-form-item label="出发地" prop="startPlace" required>
                     <el-input v-model="editForm.startPlace" autocomplete="off"></el-input>
