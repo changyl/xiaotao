@@ -1,65 +1,70 @@
 <template>
+    <div class="table">
+        <div class="container">
+            <div class="handle-box">
+                <el-input v-model="select_word" placeholder="用户名称" class="handle-input mr10"></el-input>
+                <el-button type="warning" icon="search" :loading="loading_status" @click="getData()">搜索</el-button>
+                <el-button type="primary" icon="insert" @click="insert">新增</el-button>
+            </div>
+            <el-table :data="tableData" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
+                <el-table-column type="selection" width="55" align="center"></el-table-column>
+                <el-table-column prop="sysUserId" label="系统用户ID" sortable></el-table-column>
+                <el-table-column prop="username" label="昵称"></el-table-column>
+                <el-table-column prop="mobile" label="手机号"></el-table-column>
+                <el-table-column prop="role" label="角色"></el-table-column>
+                <el-table-column prop="dateline" label="创建时间"></el-table-column>
+                <el-table-column label="操作" align="center">
+                    <template slot-scope="scope">
+                        <el-button type="primary" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑
+                        </el-button>
+                        <el-button type="danger" icon="el-icon-delete" class="white"
+                                   @click="handleDelete(scope.$index, scope.row)">删除
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <div class="pagination">
+                <el-pagination background @current-change="handleCurrentChange" layout="prev, pager, next" :total="(this.total)">
+                </el-pagination>
+            </div>
+        </div>
 
-                    <div class="table">
-                        <div class="container">
+        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
+            <el-form ref="form" :model="editForm" label-width="100px">
+                <el-form-item label="昵称" prop="username" required>
+                    <el-input v-model="editForm.username" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="手机号" prop="mobile" required>
+                    <el-input v-model="editForm.mobile" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="角色" prop="role" required>
+                    <el-input v-model="editForm.role" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="danger" @click="closeEdit()">取消</el-button>
+                <el-button type="primary" @click="saveEdit(editForm)">保存</el-button>
+            </div>
+        </el-dialog>
 
-                            <el-table :data="tableData" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
-                                <el-table-column type="selection" width="55" align="center"></el-table-column>
-                                <el-table-column prop="sysUserId" label="系统用户ID" sortable ></el-table-column>
-                                <el-table-column prop="name" label="昵称" ></el-table-column>
-                                <el-table-column prop="mobile" label="手机号"  ></el-table-column>
-                                <el-table-column prop="dateline" label="创建时间"  ></el-table-column>
-                                <!--<el-table-column label="操作"  align="center">-->
-                                    <!--<template slot-scope="scope">-->
-                                        <!--<el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>-->
-                                        <!--&lt;!&ndash;<el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>&ndash;&gt;-->
-                                    <!--</template>-->
-                                <!--</el-table-column>-->
-                            </el-table>
-                            <div class="pagination">
-                                <el-pagination background @current-change="handleCurrentChange" layout="prev, pager, next" :total="(this.total)">
-                                </el-pagination>
-                            </div>
-                        </div>
-
-                        <!-- 编辑弹出框 -->
-                        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-                            <el-form ref="form" :model="form" label-width="50px">
-                                <el-form-item label="Id:">
-                                    <el-input v-model="form.Id" :disabled="true"></el-input>
-                                </el-form-item>
-                                <el-form-item label="Sid:" >
-                                    <el-input v-model="form.serverInstanceId" :disabled="true"></el-input>
-                                </el-form-item>
-                                <el-form-item label="role:" >
-                                    <el-input v-model="form.role" :disabled="true"></el-input>
-                                </el-form-item>
-                                <el-form-item label="Read:" >
-                                    <el-input v-model="form.isReadOnly" :disabled="true"></el-input>
-                                </el-form-item>
-                                <el-form-item label="Status:" >
-                                    <el-input v-model="form.status" :disabled="true"></el-input>
-                                </el-form-item>
-
-                                <el-form-item label="Status:" >
-                                    <el-select v-model="form.status" placeholder="请选择">
-                                        <el-option key="0" label="初始化" value="0"></el-option>
-                                        <el-option key="1" label="创建中" value="1"></el-option>
-                                        <el-option key="2" label="运行中" value="2"></el-option>
-                                        <el-option key="3" label="停服" value="3"></el-option>
-                                        <el-option key="4" label="已销毁" value="4"></el-option>
-                                        <el-option key="5" label="重启中" value="5"></el-option>
-                                        <el-option key="6" label="恢复中" value="6"></el-option>
-                                    </el-select>
-                                </el-form-item>
-                            </el-form>
-                            <span slot="footer" class="dialog-footer">
-                            <el-button @click="editVisible = false">取 消</el-button>
-                            <el-button type="warning" @click="saveEdit">确 定</el-button>
-
-                            </span>
-                        </el-dialog>
-                    </div>
+        <el-dialog title="新增" :visible.sync="insertVisible" width="30%">
+            <el-form ref="form" :model="insertForm" label-width="100px">
+                <el-form-item label="昵称" prop="username" required>
+                    <el-input v-model="insertForm.username" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="手机号" prop="mobile" required>
+                    <el-input v-model="insertForm.mobile" autocomplete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="角色" prop="role" required>
+                    <el-input v-model="insertForm.role" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="danger" @click="closeInsert()">取消</el-button>
+                <el-button type="primary" @click="saveInsert(insertForm)">保存</el-button>
+            </div>
+        </el-dialog>
+    </div>
 
 </template>
 
@@ -70,6 +75,8 @@
             return {
                 message: 'first',
                 url: '/xiaotao/system/sysUserList',
+                updateUrl: '/xiaotao/system/saveOrUpdate',
+                deleteUrl: '/xiaotao/system/deleteByPrimaryKey',
                 tableData: [],
                 total: 0,
                 cur_page: 1,
@@ -79,20 +86,17 @@
                 del_list: [],
                 is_search: false,
                 editVisible: false,
+                insertVisible: false,
                 delVisible: false,
-                form: {
-                    sysUserId:'',
-                    name: '',
-                    mobile: '',
-                    dateline: ''
-                },
+                editForm: [],
+                insertForm: [],
                 idx: -1
             }
         },
         activated() {
             this.getData();
         },
-        mounted(){
+        mounted() {
             this.getData();
         },
 
@@ -107,7 +111,8 @@
                 // 开发环境使用 easy-mock 数据，正式环境使用 json 文件
                 if (process.env.NODE_ENV === 'development') {
                     this.url = this.url;
-                };
+                }
+                ;
                 this.$axios.get(this.url, {
                     params: {p: this.cur_page, size: 10}
                 }).then((res) => {
@@ -128,17 +133,30 @@
                 this.idx = index;
                 const item = this.tableData[index];
                 this.form = {
-                    Id: item.Id,
-                    serverInstanceId: item.serverInstanceId,
-                    role: item.role,
-                    isReadOnly: item.isReadOnly,
-                    status: item.status
+                    sysUserId: item.sysUserId,
+                    totalSum: item.totalSum,
+                    modifiedTime: item.modifiedTime
                 }
                 this.editVisible = true;
+                this.editForm = Object.assign({}, row);
+            },
+            closeEdit(){
+                this.editVisible = false;
             },
             handleDelete(index, row) {
-                this.idx = index;
-                this.delVisible = true;
+                const item = this.tableData[index];
+                console.log(item.waylineId);
+                this.$axios.post(this.deleteUrl, {
+                    sysUserId: item.sysUserId
+                }).then((res) => {
+                    if (res.data.code == 0) {
+                        alert("删除成功!");
+                        this.search();
+                    } else {
+                        alert("删除失败!");
+                    }
+                    this.editVisible = false;
+                }).finally(this.loading_status = false)
             },
             delAll() {
                 const length = this.multipleSelection.length;
@@ -154,13 +172,53 @@
                 this.multipleSelection = val;
             },
             // 保存编辑
-            saveEdit() {
-                this.$set(this.tableData, this.idx, this.form);
-                this.editVisible = false;
-                this.$message.success(`修改第 ${this.idx+1} 行成功`);
+            saveEdit(data) {
+                this.$set(this.tableData, this.idx, data);
+
+                this.$axios.post(this.updateUrl, {
+                    sysUserId: data.sysUserId,
+                    username: data.username,
+                    mobile: data.mobile,
+                    status: data.status,
+                    role: data.role
+                }).then((res) => {
+                    if (res.data.code == 0) {
+                        alert("修改成功!");
+                    } else {
+                        alert("修改失败!");
+                    }
+                    this.editVisible = false;
+                    this.getData();
+                }).finally(this.loading_status = false)
+            },
+            //  打开新增窗口
+            insert() {
+                this.insertVisible = true;
+            },
+            closeInsert() {
+                this.insertVisible = false;
+            },
+            //  保存新增
+            saveInsert(data) {
+                this.$set(this.tableData, this.idx, data);
+                this.$axios.post(this.updateUrl, {
+                    username: data.username,
+                    mobile: data.mobile,
+                    status: data.status,
+                    role: data.role
+                }).then((res) => {
+                    console.log("res" + res.data.code);
+                    if (res.data.code == 0) {
+                        alert("添加成功!");
+                        this.getData();
+                    } else {
+                        alert(res.data.message);
+                    }
+                    this.insertVisible = false;
+                }).finally(this.loading_status = false)
             },
             // 确定删除
-            deleteRow(){
+            deleteRow() {
                 this.tableData.splice(this.idx, 1);
                 this.$message.success('删除成功');
                 this.delVisible = false;
@@ -184,15 +242,18 @@
         width: 300px;
         display: inline-block;
     }
-    .del-dialog-cnt{
+
+    .del-dialog-cnt {
         font-size: 16px;
         text-align: center
     }
-    .table{
+
+    .table {
         width: 100%;
         font-size: 14px;
     }
-    .red{
+
+    .red {
         color: #ff0000;
     }
 </style>

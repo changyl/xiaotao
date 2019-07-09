@@ -12,7 +12,7 @@
                 <!--<el-option key="5" label="failed" value="3"></el-option>-->
                 <!--<el-option key="6" label="error" value="4"></el-option>-->
                 <!--</el-select>-->
-                <el-input v-model="select_word" placeholder="顺道名称" class="handle-input mr10"></el-input>
+                <el-input v-model="select_word" placeholder="司机名称" class="handle-input mr10"></el-input>
                 <el-button type="warning" icon="search" :loading="loading_status" @click="search">搜索</el-button>
             </div>
             <el-table :data="tableData" border class="table" ref="multipleTable"
