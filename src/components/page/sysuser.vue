@@ -114,7 +114,7 @@
                 }
                 ;
                 this.$axios.get(this.url, {
-                    params: {p: this.cur_page, size: 10}
+                    params: {p: this.cur_page, size: 10, username: this.select_word}
                 }).then((res) => {
                     this.tableData = res.data.data.data;
                     this.total = res.data.data.size;
