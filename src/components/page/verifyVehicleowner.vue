@@ -28,7 +28,7 @@
                 <el-table-column prop="driverCardback" label="驾驶证反面"></el-table-column>
                 <el-table-column prop="isVerify" label="审核状态">
                     <template slot-scope="scope">
-                        <span>{{ scope.row.isVerify == '1' ? '通过' : (scope.row.isVerify == '0' ? '拒绝' : '未审核') }}</span>
+                        <span>{{ scope.row.isVerify == '1' ? '通过' : (scope.row.isVerify == '2' ? '未通过' : '未审核') }}</span>
                     </template>
                 </el-table-column>
                 <el-table-column prop="createTime" label="创建时间"></el-table-column>
@@ -116,8 +116,19 @@
                 <el-button type="primary" @click="saveInsert(insertForm)">保存</el-button>
             </div>
         </el-dialog>
-    </div>
 
+        <el-dialog title="审核" :visible.sync="verifyVisible" width="30%">
+            <el-form ref="form" :model="verifyForm" label-width="100px">
+                <el-form-item label="拒绝理由" prop="remark" required>
+                    <el-input v-model="verifyForm.remark" autocomplete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button type="danger" @click="verifyEdit()">取消</el-button>
+                <el-button type="primary" @click="verifyEdit(verifyForm)">提交</el-button>
+            </div>
+        </el-dialog>
+    </div>
 
 </template>
 
@@ -128,7 +139,7 @@
             return {
                 message: 'first',
                 url: '/xiaotao/vehicleowner/listVehicleOwner',
-                updateUrl: '/xiaotao/vehicleowner/verify',
+                updateUrl: 'https://xiaotao.itzh.org/api/vehicleOwner/verify',
                 deleteUrl: '/xiaotao/vehicleowner/deleteByPrimaryKey',
                 tableData: [],
                 total: 0,
@@ -150,7 +161,9 @@
                 },
                 idx: -1,
                 insertVisible: false,
-                insertForm: []
+                insertForm: [],
+                verifyVisible: false,
+                verifyForm: []
             }
         },
         activated() {
@@ -266,6 +279,22 @@
                     idCardBack: data.idCardBack,
                     driverCardfront: data.driverCardfront,
                     driverCardback: data.driverCardback
+                }).then((res) => {
+                    if (res.data.code == 0) {
+                        alert("修改成功!");
+                    } else {
+                        alert("修改失败!");
+                    }
+                    this.editVisible = false;
+                    this.search();
+                }).finally(this.loading_status = false)
+            },
+            // 保存审核
+            verifyEdit(data) {
+                this.$set(this.tableData, this.idx, data);
+                this.$axios.post(this.updateUrl, {
+                    userId: data.userId,
+                    remark: data.remark
                 }).then((res) => {
                     if (res.data.code == 0) {
                         alert("修改成功!");
