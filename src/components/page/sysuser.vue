@@ -6,7 +6,8 @@
                 <el-button type="warning" icon="search" :loading="loading_status" @click="getData()">搜索</el-button>
                 <el-button type="primary" icon="insert" @click="insert">新增</el-button>
             </div>
-            <el-table :data="tableData" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
+            <el-table :data="tableData" border class="table" ref="multipleTable"
+                      @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                 <el-table-column prop="sysUserId" label="系统用户ID" sortable></el-table-column>
                 <el-table-column prop="username" label="昵称"></el-table-column>
@@ -24,7 +25,8 @@
                 </el-table-column>
             </el-table>
             <div class="pagination">
-                <el-pagination background @current-change="handleCurrentChange" layout="prev, pager, next" :total="(this.total)">
+                <el-pagination background @current-change="handleCurrentChange" layout="prev, pager, next"
+                               :total="(this.total)">
                 </el-pagination>
             </div>
         </div>
@@ -37,8 +39,24 @@
                 <el-form-item label="手机号" prop="mobile" required>
                     <el-input v-model="editForm.mobile" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="角色" prop="role" required>
-                    <el-input v-model="editForm.role" autocomplete="off"></el-input>
+                <!--<el-form-item label="角色" prop="role" required>-->
+                <!--<el-input v-model="editForm.role" autocomplete="off"></el-input>-->
+                <!--</el-form-i
+                。tem>-->
+                <!---->
+                <el-form-item label="角色:">
+                    <el-select :placeholder="showRole(editForm)" @change="onEditRoleChange"
+                               :remote-method="remoteMethod">
+                        <el-option
+                                v-for="item in roleList"
+                                :key="item.roleId"
+                                :label="item.roleName"
+                                :value="item">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="密码" prop="password" required>
+                    <el-input v-model="editForm.password" autocomplete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -55,8 +73,19 @@
                 <el-form-item label="手机号" prop="mobile" required>
                     <el-input v-model="insertForm.mobile" autocomplete="off"></el-input>
                 </el-form-item>
-                <el-form-item label="角色" prop="role" required>
-                    <el-input v-model="insertForm.role" autocomplete="off"></el-input>
+                <el-form-item label="角色:">
+                    <el-select :placeholder="showInsertRole(insertForm)" @change="onInsertRoleChange"
+                               :remote-method="remoteMethod">
+                        <el-option
+                                v-for="item in roleList"
+                                :key="item.roleId"
+                                :label="item.roleName"
+                                :value="item">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="密码" prop="role" required>
+                    <el-input v-model="insertForm.password" autocomplete="off"></el-input>
                 </el-form-item>
             </el-form>
             <div slot="footer" class="dialog-footer">
@@ -77,6 +106,7 @@
                 url: '/xiaotao/system/sysUserList',
                 updateUrl: '/xiaotao/system/saveOrUpdate',
                 deleteUrl: '/xiaotao/system/deleteByPrimaryKey',
+                roleUrl: '/xiaotao/role/listRole',
                 tableData: [],
                 total: 0,
                 cur_page: 1,
@@ -88,6 +118,8 @@
                 editVisible: false,
                 insertVisible: false,
                 delVisible: false,
+                roleList: [],
+                roleName:'',
                 editForm: [],
                 insertForm: [],
                 idx: -1
@@ -137,10 +169,17 @@
                     totalSum: item.totalSum,
                     modifiedTime: item.modifiedTime
                 }
-                this.editVisible = true;
-                this.editForm = Object.assign({}, row);
+
+                this.$axios.get(this.roleUrl).then((res) => {
+                    if (res.data.code == 0) {
+                        this.roleList = res.data.data;
+                    }
+                    // console.log("roleList:" + this.roleList[0].roleName)
+                    this.editVisible = true;
+                    this.editForm = Object.assign({}, row);
+                });
             },
-            closeEdit(){
+            closeEdit() {
                 this.editVisible = false;
             },
             handleDelete(index, row) {
@@ -171,6 +210,41 @@
             handleSelectionChange(val) {
                 this.multipleSelection = val;
             },
+            showRole(data) {
+                if (data.role == '') {
+                    return "请选择";
+                }
+                for (var i = 0; i < this.roleList.length; i++) {
+                    if (this.roleList[i].roleId == data.role) {
+                        this.roleName = this.roleList[i].roleName;
+                        console.log(this.roleName)
+                        return this.roleName;
+                    }
+                }
+            },
+            showInsertRole(insertData){
+                if (insertData.role == ''){
+                    return "请选择";
+                }
+
+                for (var i = 0; i < this.roleList.length; i++) {
+                    if (this.roleList[i].roleId == insertData.role) {
+                        this.roleName = this.roleList[i].roleName;
+                        console.log(this.roleName)
+                        return this.roleName;
+                    }
+                }
+            },
+            onEditRoleChange(event){
+              this.editForm.role = event.roleId;
+              this.roleName = event.roleName;
+              // console.log(this.roleName)
+            },
+            onInsertRoleChange(event){
+              this.insertForm.role = event.roleId;
+              this.roleName = event.roleName;
+              // console.log("roleName:"+this.roleName)
+            },
             // 保存编辑
             saveEdit(data) {
                 this.$set(this.tableData, this.idx, data);
@@ -180,7 +254,8 @@
                     username: data.username,
                     mobile: data.mobile,
                     status: data.status,
-                    role: data.role
+                    role: data.role,
+                    password: data.password
                 }).then((res) => {
                     if (res.data.code == 0) {
                         alert("修改成功!");
@@ -193,10 +268,18 @@
             },
             //  打开新增窗口
             insert() {
+                this.$axios.get(this.roleUrl).then((res) => {
+                    if (res.data.code == 0) {
+                        this.roleList = res.data.data;
+                    }
+                    // console.log("roleList:" + this.roleList[0].roleName)
+
+                });
                 this.insertVisible = true;
             },
             closeInsert() {
                 this.insertVisible = false;
+                this.insertForm = [];
             },
             //  保存新增
             saveInsert(data) {
@@ -205,7 +288,8 @@
                     username: data.username,
                     mobile: data.mobile,
                     status: data.status,
-                    role: data.role
+                    role: data.role,
+                    password: data.password
                 }).then((res) => {
                     console.log("res" + res.data.code);
                     if (res.data.code == 0) {
@@ -215,6 +299,7 @@
                         alert(res.data.message);
                     }
                     this.insertVisible = false;
+                    this.insertForm = [];
                 }).finally(this.loading_status = false)
             },
             // 确定删除

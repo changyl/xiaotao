@@ -2,7 +2,7 @@
 
                     <div class="table">
                         <div class="container">
-                            <el-table :data="tableData" border class="table" ref="multipleTable" @selection-change="handleSelectionChange">
+                            <el-table :data="tableData" border class="table" ref="multipleTable" @selection-change="handleSelectionChange" >
                                 <el-table-column type="selection" width="55" align="center"></el-table-column>
                                 <el-table-column prop="userId" label="用户ID" sortable width="90"></el-table-column>
                                 <el-table-column prop="nickName" label="昵称"  ></el-table-column>
@@ -10,12 +10,13 @@
                                 <el-table-column prop="status" :formatter="statusFormat" label="状态"  ></el-table-column>
                                 <el-table-column prop="gender" :formatter="genderFormat" label="性别"  ></el-table-column>
                                 <el-table-column prop="createTime" label="创建时间" ></el-table-column>
-                                <!--<el-table-column label="操作" width="80" align="center">-->
-                                    <!--<template slot-scope="scope">-->
-                                        <!--<el-button type="text" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row)">编辑</el-button>-->
-                                        <!--&lt;!&ndash;<el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>&ndash;&gt;-->
-                                    <!--</template>-->
-                                <!--</el-table-column>-->
+                                <el-table-column label="操作" width="80" align="center">
+                                    <template slot-scope="scope" width="100%" height="100%">
+                                        <el-button type="primary" icon="el-icon-edit" @click="handleDetail(scope.row)" >详情</el-button>
+                                        <el-button type="primary" icon="el-icon-edit" @click="handleComment(scope.row)">评论数据</el-button>
+                                        <!--<el-button type="text" icon="el-icon-delete" class="red" @click="handleDelete(scope.$index, scope.row)">删除</el-button>-->
+                                    </template>
+                                </el-table-column>
                             </el-table>
                             <div class="pagination">
                                 <el-pagination background @current-change="handleCurrentChange" layout="prev, pager, next" :total="(this.total)">
@@ -23,35 +24,43 @@
                             </div>
                         </div>
 
-                        <!-- 编辑弹出框 -->
-                        <el-dialog title="编辑" :visible.sync="editVisible" width="30%">
-                            <el-form ref="form" :model="form" label-width="50px">
-                                <el-form-item label="Id:">
-                                    <el-input v-model="form.id" :disabled="true"></el-input>
+                        <!-- 详情弹出框 -->
+                        <el-dialog title="详情" :visible.sync="detailVisible" width="30%">
+                            <el-form ref="this.userDetail" :model="this.userDetail" label-width="50px">
+                                <el-form-item label="userId:">
+                                    <el-input v-model="this.userDetail.userId" :disabled="true"></el-input>
                                 </el-form-item>
-                                <el-form-item label="Sid:" >
-                                    <el-input v-model="form.serverInstanceId" :disabled="true"></el-input>
+                                <el-form-item label="昵称:" >
+                                    <el-input v-model="this.userDetail.nickName" :disabled="true"></el-input>
                                 </el-form-item>
+                                <el-form-item label="openId:" >
+                                    <el-input v-model="this.userDetail.openId" :disabled="true"></el-input>
+                                </el-form-item>
+                                <el-form-item label="unionId:" >
+                                    <el-input v-model="this.userDetail.unionId" :disabled="true"></el-input>
+                                </el-form-item>
+                                <el-form-item label="unionId:" >
+                                    <el-input v-model="this.userDetail.phone" :disabled="true"></el-input>
+                                </el-form-item>
+                                <el-form-item label="手机:" >
+                                    <el-input v-model="this.userDetail.phone" :disabled="true"></el-input>
+                                </el-form-item>
+                                <el-form-item label="性别:" >
+                                    <el-input v-model="this.userDetail.gender == 1 ? '男':'女' " :disabled="true"></el-input>
+                                </el-form-item>
+                                <el-form-item label="城市:" >
+                                    <el-input v-model="this.userDetail.city" :disabled="true"></el-input>
+                                </el-form-item>
+                                <el-form-item label="省份:" >
+                                    <el-input v-model="this.userDetail.province" :disabled="true"></el-input>
+                                </el-form-item>
+                                <el-form-item label="头像:" >
+                                    <img :src="this.userDetail.avatarUrl" style="width: 100px; height: 100px" class="image"/>
 
-                                <el-form-item label="Status:" >
-                                    <el-select v-model="form.status" placeholder="请选择">
-                                        <el-option key="0" label="初始化" value="0"></el-option>
-                                        <el-option key="1" label="创建中" value="1"></el-option>
-                                        <el-option key="2" label="运行中" value="2"></el-option>
-                                        <el-option key="3" label="欠费停服" value="3"></el-option>
-                                        <el-option key="4" label="已销毁" value="4"></el-option>
-                                        <el-option key="5" label="维护中" value="5"></el-option>
-                                        <el-option key="6" label="手动删除" value="6"></el-option>
-                                        <el-option key="7" label="重启中" value="7"></el-option>
-                                        <el-option key="8" label="恢复中" value="8"></el-option>
-                                        <el-option key="9" label="停止中" value="9"></el-option>
-                                        <el-option key="10" label="创建异常" value="10"></el-option>
-                                    </el-select>
                                 </el-form-item>
                             </el-form>
                             <span slot="footer" class="dialog-footer">
-                            <el-button @click="editVisible = false">取 消</el-button>
-                            <el-button type="warning" @click="saveEdit">确 定</el-button>
+                            <el-button @click="detailVisible = false">取 消</el-button>
                             </span>
                         </el-dialog>
                     </div>
@@ -67,6 +76,7 @@
             return {
                 message: 'first',
                 url: '/xiaotao/user/userList',
+                detailUserUrl:'/xiaotao/user/userDetail',
                 tableData: [],
                 total: 0,
                 cur_page: 0,
@@ -75,8 +85,9 @@
                 select_word: '',
                 del_list: [],
                 is_search: false,
-                editVisible: false,
+                detailVisible: false,
                 delVisible: false,
+                userDetail:{},
                 form: {
                     userId:'',
                     nickName: '',
@@ -161,16 +172,25 @@
             filterTag(value, row) {
                 return row.tag === value;
             },
-            handleEdit(index, row) {
-                this.idx = index;
-                const item = this.tableData[index];
-                this.form = {
-                    id: item.id,
-                    serverInstanceId: item.serverInstanceId,
-                    instanceName:item.instanceName,
-                    status: item.status
-                }
-                this.editVisible = true;
+            handleDetail(row) {
+                var userDatail;
+
+                this.$axios.get(this.detailUserUrl, {
+                    params: {userId:row.userId}
+                }).then((res) => {
+                    //console.log(res.data.data)
+                    if (res.data.code==0){
+                        this.userDetail = res.data.data;
+                        console.log(res.data.data)
+                        // Object.assign({}, res.data.data);
+                        this.detailVisible = true;
+                    }
+                })
+                console.log(1111,this.userDetail)
+                // Object.assign({}, userDatail);
+            },
+            handleComment(){
+
             },
             handleDelete(index, row) {
                 this.idx = index;

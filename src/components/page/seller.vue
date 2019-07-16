@@ -87,6 +87,17 @@
                         <img :src="editForm.license" style="width: 100px; height: 100px" class="image"/>
 
                     </el-form-item>
+                    <el-upload action="http://upload-z1.qiniup.com" :before-upload="beforeAvatarUpload" class="img-uploader" :data="qiNiuYunData" :on-success="handleEditSellerLicenseSuccess">
+                        <el-button size="small" type="primary" calss="upload-Button">点击上传</el-button>
+                    </el-upload>
+
+                    <el-form-item label="商家图片:">
+                        <img :src="editForm.image" style="width: 100px; height: 100px" class="image"/>
+
+                    </el-form-item>
+                    <el-upload action="http://upload-z1.qiniup.com" :before-upload="beforeAvatarUpload" class="img-uploader" :data="qiNiuYunData" :on-success="handleEditSellerImageSuccess">
+                        <el-button size="small" type="primary" calss="upload-Button">点击上传</el-button>
+                    </el-upload>
                 </el-form>
                 <span slot="footer" class="dialog-footer">
                             <el-button @click="editVisible = false">取 消</el-button>
@@ -168,7 +179,7 @@
                     <!--</el-form-item>-->
                 </el-form>
                 <span slot="footer" class="dialog-footer">
-                            <el-button @click="editVisible = false">取 消</el-button>
+                            <el-button @click="insertVisible = false">取 消</el-button>
                             <el-button type="warning" @click="saveInsert(insertForm)">确 定</el-button>
 
                             </span>
@@ -334,6 +345,7 @@
                 console.log(this.value);
                 // this.$message.success(`修改第 ${this.idx+1} 行成功`);
                 // console.log(editForm.sellerStatus);
+                console.log(data.license)
                 this.$axios.post(this.updateUrl, {
 
                     sellerId: data.sellerId,
@@ -341,7 +353,8 @@
                     sellerName: data.sellerName,
                     introduce: data.introduce,
                     image: data.image,
-                    sellerStatus: data.sellerStatus
+                    sellerStatus: data.sellerStatus,
+                    license:data.license
                 }).then((res) => {
                     console.log("res" + res.data.code);
                     if (res.data.code == 0) {
@@ -406,9 +419,19 @@
                 if (insertFormData.sellerName == ''){
                     alert("商家名不能为空")
                 }
+                return;
                 if (insertFormData.introduce == ''){
                     alert("描述不能为空")
                 }
+                return;
+                if (insertFormData.sellerStatus == ''){
+                    alert("请选择商家状态")
+                }
+                return;
+                if (insertFormData.isVerify == ''){
+                    alert("请选择商家审核状态")
+                }
+                return;
                 this.$axios.post(this.updateUrl, {
 
                     // sellerId: data.sellerId,
@@ -468,6 +491,12 @@
             },
             handleSellerLicenseSuccess(res,file){
                 this.insertForm.license= this.qiNiuYunUrl+ "/"+file.name;
+            },
+            handleEditSellerImageSuccess(res,file){
+                this.editForm.image= this.qiNiuYunUrl+ "/"+file.name;
+            },
+            handleEditSellerLicenseSuccess(res,file){
+                this.editForm.license= this.qiNiuYunUrl+ "/"+file.name;
             }
         },
 
