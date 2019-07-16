@@ -44,7 +44,7 @@
                         <el-button type="primary" icon="el-icon-edit" @click="handleEdit(scope.$index, scope.row, '1')">通过
                         </el-button>
                         <el-button type="danger" icon="el-icon-delete" class="white"
-                                   @click="handleEdit(scope.$index, scope.row, '0')">拒绝
+                                   @click="handleVerify(scope.$index, scope.row, '0')">拒绝
                         </el-button>
                     </template>
                 </el-table-column>
@@ -163,7 +163,8 @@
                 insertVisible: false,
                 insertForm: [],
                 verifyVisible: false,
-                verifyForm: []
+                verifyForm: [],
+                loginUserId: ''
             }
         },
         activated() {
@@ -201,6 +202,7 @@
                     console.log(res.data)
                     this.tableData = res.data.data.data;
                     this.total = res.data.data.size;
+                    this.loginUserId = res.data.data.data[0].loginUserId;
                 })
             },
             //  搜索查询
@@ -288,6 +290,19 @@
                     this.editVisible = false;
                     this.search();
                 }).finally(this.loading_status = false)
+            },
+            //  打开审核
+            handleVerify(index, row, isVerify) {
+                console.log(item);
+                this.idx = index;
+                const item = this.tableData[index];
+                this.form = {
+                    user_id: item.userId,
+                    seller_id: this.loginUserId,
+                    isVerify: isVerify
+                }
+                this.verifyVisible = true;
+                this.verifyForm = Object.assign({}, row);
             },
             // 保存审核
             verifyEdit(data) {
